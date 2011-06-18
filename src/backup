@@ -1,0 +1,43 @@
+/*
+ * Material_Window.cpp
+ *
+ *  Created on: Feb 15, 2011
+ *      Author: khanh
+ */
+
+#include "Material_Window.h"
+
+Material_Window::Material_Window(int w, int h, const char* label):
+    Fl_Window(w,h,label)
+{
+
+    // padding
+    const int padding_right = 10;
+    const int padding_left  = 10;
+
+    // graphics window on left-hand side
+    glwin = new GL_Window(10,10,w-300,h-20);
+
+    // settings tabs on right-hand side
+    tabs  = new Fl_Tabs(w-280,10,300, h-20);
+    {
+        material_tab = new Fl_Group(w-280, 30,100,h-20, "Material");
+        {
+            Rcolor_slider = new Fl_Slider(w-270,40,250,20, "Red Value");
+            Rcolor_slider->type(1);
+        }
+        material_tab->end();
+
+        texture_tab = new Fl_Group(0, 30,100,h-20, "Texture" );
+        {
+
+        }
+        texture_tab->end();
+
+        presets_tab = new Fl_Group(0, 30,100,h-20, "Presets" );
+        {
+
+        }
+        presets_tab->end();
+    }
+}
