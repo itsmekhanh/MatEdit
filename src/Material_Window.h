@@ -39,6 +39,12 @@
 
 using namespace std;
 
+struct texture_element{
+	string name;
+	string path;
+	osg::ref_ptr<osg::Image> image;
+};
+
 class Material_Window: public Fl_Window{
 
 public:
@@ -136,8 +142,10 @@ private:
     Fl_Choice *MIN_filterMode_choices;      // MIN filter Modes
     Fl_Choice *MAG_filterMode_choices;      // MAG filter Modes
 
-    vector<string> loaded_textures;			// textures stored in memory <name in list, filepath>
-    vector<string> loaded_texture_paths;    // paths of the texture files
+    //vector<string> loaded_textures;			// textures stored in memory <name in list, filepath>
+    //vector<string> loaded_texture_paths;    // paths of the texture files
+    vector<texture_element> loaded_textures;    // textures stored in memory (name, path, image)
+
     int iTexture;
 /* ----------------------- code generation -------------------------*/
 

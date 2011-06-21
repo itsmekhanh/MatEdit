@@ -40,8 +40,8 @@ public:
                           float sr, float sg, float sb,
                           float ar, float ag, float ab,
                           float _shine, float _alpha);
-    void addTexture(string name, string path);
-    void getTexture(int index);
+    //void addTexture(string name, string path);
+    void getTexture(osg::ref_ptr<osg::Image>);
     void changeShape(int old, int next);
 
 private:

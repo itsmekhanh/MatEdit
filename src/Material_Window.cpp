@@ -204,9 +204,15 @@ Material_Window::Material_Window(int w, int h, const char* label):
 
     		temp.clear();
     		texture_choices->add("none",0, Texture_CB, (void*)this);
-			loaded_textures.push_back("/none");
-			loaded_texture_paths.push_back("none");
-			glwin->addTexture("none", "none");
+    		struct texture_element none;
+    		none.name = "/none";
+    		none.path = "none";
+    		none.image = '\0';
+
+    		loaded_textures.push_back(none);
+			//loaded_textures.push_back("/none");
+			//loaded_texture_paths.push_back("none");
+			//glwin->addTexture("none", "none");
 
             getTextures("textures");
 
@@ -553,7 +559,7 @@ void Material_Window::UpdateCode2(){
 
     if(iTexture != 0){
 
-    code.append((string)image_var->value()+" = osgDB::readImageFile(\""+loaded_texture_paths[iTexture]+"\");\n");
+    code.append((string)image_var->value()+" = osgDB::readImageFile(\""+loaded_textures[iTexture].path+"\");\n");
     code.append((string)texture_var->value()+" = new osg::Texture2D;\n");
     code.append((string)texture_var->value()+"->setImage("+(string)image_var->value()+".get());\n");
 
@@ -640,10 +646,16 @@ void Material_Window::Texture_CB2(){
 
 	// grab texture
 	texture_choices->item_pathname(selected, sizeof(selected)-1);
+
+	printf("in texture_cb2: %s\n", selected);
+	printf("size of loaded_textures: %d\n", loaded_textures.size());
 	for(i=0; i < loaded_textures.size(); i++){
-		if(!strcmp(loaded_textures[i].c_str(),selected)){
-			glwin->getTexture(i);
-			iTexture = i;
+
+	    printf("looking at: %s\n", loaded_textures[i].name.c_str());
+		if(!strcmp(loaded_textures[i].name.c_str(),selected)){
+		    printf("selected: %s loaded_texture: %s\n", selected, loaded_textures[i].name.c_str());
+			//glwin->getTexture(i);
+			glwin->getTexture(loaded_textures[i].image);
 		}
 	}
 	changed = 1;
@@ -662,7 +674,7 @@ void Material_Window::Load_Texture_CB2(){
     string *path;
     string file;
 
-    newfile = fl_file_chooser("Open File?", "*", filename);
+    newfile = fl_file_chooser("Load Texture?", "*", filename);
     if(newfile != '\0')
     {
 
@@ -674,10 +686,16 @@ void Material_Window::Load_Texture_CB2(){
             found = path->find_last_of("/\\");
             file = path->substr(found+1);
 
-            glwin->addTexture(file,*path);
+            //glwin->addTexture(file,*path);
             texture_choices->add(file.c_str(),0,Texture_CB, (void*)this);
-            loaded_textures.push_back("/"+file);
-            loaded_texture_paths.push_back(*path);
+            //loaded_textures.push_back("/"+file);
+            //loaded_texture_paths.push_back(*path);
+            struct texture_element te;
+            te.name = "/"+file;
+            te.path = *path;
+            te.image = osgDB::readImageFile(*path);
+            loaded_textures.push_back(te);
+
         }
         else
         {
@@ -815,6 +833,9 @@ void Material_Window::save_file(char* f){
     mxml_node_t     *g_node;            // <G>
     mxml_node_t     *b_node;            // <B>
     mxml_node_t		*texture_node;      // <texture>
+    mxml_node_t		*name_node;			// <name>
+    mxml_node_t		*path_node;			// <path>
+    mxml_node_t		*shape_node;		// <shape>
 
     tree            = mxmlNewXML("1.0");
     material_node   = mxmlNewElement(tree, "material");
@@ -850,12 +871,19 @@ void Material_Window::save_file(char* f){
     mxmlNewText(alpha_node, 0, alpha_input->value());
 
     // grab only index of texture in library
-    texture_node    = mxmlNewElement(material_node, "texture");
-    mxmlNewInteger(texture_node, iTexture);
+    for(int i=0; i<loaded_textures.size(); i++){
+        texture_node    = mxmlNewElement(material_node, "texture");
+        name_node       = mxmlNewElement(texture_node, "name");
+        mxmlNewText(name_node,0,loaded_textures[i].name.c_str());
+        path_node       = mxmlNewElement(texture_node, "path");
+        mxmlNewText(path_node,0,loaded_textures[i].path.c_str());
+    }
+
+    //mxmlNewInteger(texture_node, iTexture);
 
     // grab only index of shape in library
-    texture_node    = mxmlNewElement(material_node, "shape");
-    mxmlNewInteger(texture_node, iShape);
+    shape_node    = mxmlNewElement(material_node, "shape");
+    mxmlNewInteger(shape_node, iShape);
 
     fp = fopen(f, "w");
     mxmlSaveFile(tree, fp, MXML_NO_CALLBACK);
@@ -946,7 +974,8 @@ void Material_Window::open_file(char* f){
         fromKeyboard = 1;
 
         UpdateMaterial2();
-        glwin->getTexture(iTexture);
+        //glwin->getTexture
+        //glwin->getTexture(iTexture);
         glwin->changeShape(iShape, next);
         iShape = next;
 
@@ -1041,21 +1070,24 @@ void Material_Window::getTextures(const char* directory){
 		while( ((ent = readdir(dir)) != NULL) )
 		{
 			if(ent->d_name[0] != '.'){
-				printf("%s\n", ent->d_name);
+				//printf("%s\n", ent->d_name);
 				texture_choices->add(ent->d_name,0,Texture_CB, (void*)this);
+
+				struct texture_element te;
 
 				temp.clear();
 				temp.append("/");
 				temp.append(ent->d_name);
-				loaded_textures.push_back(temp);
+				te.name = temp;
 
 				temp.clear();
 				temp.append(directory);
-				temp.append("//");
+				temp.append("/");
 				temp.append(ent->d_name);
-				loaded_texture_paths.push_back(temp);
+				te.path = temp;
 
-				glwin->addTexture(ent->d_name, temp);
+				te.image = osgDB::readImageFile(temp);
+				loaded_textures.push_back(te);
 			}
 		}
 		closedir(dir);

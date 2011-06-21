@@ -122,17 +122,16 @@ void GL_Window::updateProperties(float dr, float dg, float db,
 
     redraw();
 }
+//
+//void GL_Window::addTexture(string name, string path){
+//    //printf("name is: %s and path is: %s\n", name.c_str(), path.c_str());
+//	osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path);
+//    texture_vec.push_back(image);
+//}
 
-void GL_Window::addTexture(string name, string path){
-    //printf("name is: %s and path is: %s\n", name.c_str(), path.c_str());
-	osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path);
-    texture_vec.push_back(image);
-}
+void GL_Window::getTexture(osg::ref_ptr<osg::Image> image){
 
-void GL_Window::getTexture(int index){
-
-    if(index != 0){
-        osg::ref_ptr<osg::Image> image = texture_vec[index];
+    if(image != '\0'){
         texture->setImage(image.get());
         stateset->setTextureAttributeAndModes (0, texture.get(), osg::StateAttribute::ON);
     }
