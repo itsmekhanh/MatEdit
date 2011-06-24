@@ -36,7 +36,7 @@ Material_Window::Material_Window(int w, int h, const char* label):
 
     // clear filename
     memset(filename,'\0', 1024);
-    current_name = '\0';
+    memset(current_name, '\0', 1024);
 
     // menubar to open and save settings
     menubar = new Fl_Menu_Bar(0,0, w, 20);
@@ -199,79 +199,27 @@ Material_Window::Material_Window(int w, int h, const char* label):
         texture_tab = new Fl_Group(w-300, base_y_tab,tab_width,tab_height, "Texture" );
         {
             texture_choices = new Fl_Choice(slider_x+20, base_y, slider_width-5, 20, "Textures");
+    		texture_choices->clear();
+            temp.clear();
 
-    		texture_choices->add("none",0,Texture_CB, (void*)this);
-
-    		temp.clear();
     		texture_choices->add("none",0, Texture_CB, (void*)this);
+
     		struct texture_element none;
     		none.name = "/none";
     		none.path = "none";
     		none.image = '\0';
 
     		loaded_textures.push_back(none);
-			//loaded_textures.push_back("/none");
+
+    		//loaded_textures.push_back("/none");
 			//loaded_texture_paths.push_back("none");
 			//glwin->addTexture("none", "none");
 
+            //printf("in texture_tab - number of texture choices: %d\n", texture_choices->size());
+            //printf("choice 0: %s\n", texture_choices->value(0));
+            //printf("choice 1: %s\n", texture_choices->value(1));
+
             getTextures("textures");
-
-            // Load predefined textures
-            /*texture_choices->add("none",0, Texture_CB, (void*)this);
-            texture_choices->add("brick_01", 0, Texture_CB, (void*)this);
-            texture_choices->add("brick_02", 0, Texture_CB, (void*)this);
-            texture_choices->add("cardboard",0,Texture_CB, (void*)this);
-            texture_choices->add("concrete", 0, Texture_CB, (void*)this);
-            texture_choices->add("grass",0,Texture_CB, (void*)this);
-            texture_choices->add("marble",0,Texture_CB, (void*)this);
-            texture_choices->add("metal(bare)", 0, Texture_CB, (void*)this);
-            texture_choices->add("orange",0,Texture_CB, (void*)this);
-            texture_choices->add("paper_wrinkled",0,Texture_CB, (void*)this);
-            texture_choices->add("red_apple",0,Texture_CB, (void*)this);
-            texture_choices->add("water",0,Texture_CB, (void*)this);
-            texture_choices->add("wood",0,Texture_CB, (void*)this);
-
-            loaded_textures.push_back("/none");
-            loaded_textures.push_back("/brick_01");
-            loaded_textures.push_back("/brick_02");
-            loaded_textures.push_back("/cardboard");
-            loaded_textures.push_back("/concrete");
-            loaded_textures.push_back("/grass");
-            loaded_textures.push_back("/marble");
-            loaded_textures.push_back("/metal(bare)");
-            loaded_textures.push_back("/orange");
-            loaded_textures.push_back("/paper_wrinkled");
-            loaded_textures.push_back("/red_apple");
-            loaded_textures.push_back("/water");
-            loaded_textures.push_back("/wood");
-
-            loaded_texture_paths.push_back("none");
-            loaded_texture_paths.push_back("textures/brick_01.jpg");
-            loaded_texture_paths.push_back("textures/brick_02.jpg");
-            loaded_texture_paths.push_back("textures/cardboard.jpg");
-            loaded_texture_paths.push_back("textures/concrete.jpg");
-            loaded_texture_paths.push_back("textures/grass.jpg");
-            loaded_texture_paths.push_back("textures/marble.jpg");
-            loaded_texture_paths.push_back("textures/metal_bare.jpg");
-            loaded_texture_paths.push_back("textures/orange.jpg");
-            loaded_texture_paths.push_back("textures/paper_wrinkled.jpg");
-            loaded_texture_paths.push_back("textures/red_apple.jpg");
-            loaded_texture_paths.push_back("textures/water.jpg");
-            loaded_texture_paths.push_back("textures/wood.jpg");
-
-            glwin->addTexture("none", "none");
-            glwin->addTexture("brick_01", "textures/brick_01.jpg");
-            glwin->addTexture("brick_02", "textures/brick_02.jpg");
-            glwin->addTexture("cardboard", "textures/cardboard.jpg");
-            glwin->addTexture("concrete", "textures/concrete.jpg");
-            glwin->addTexture("grass", "textures/grass.jpg");
-            glwin->addTexture("marble", "textures/marble.jpg");
-            glwin->addTexture("metal(bare)", "textures/metal_bare.jpg");
-            glwin->addTexture("orange", "textures/orange.jpg");
-            glwin->addTexture("paper_wrinkled", "textures/paper_wrinkled.jpg");
-            glwin->addTexture("red_apple", "textures/red_apple.jpg");
-            glwin->addTexture("water", "textures/water.jpg");
-            glwin->addTexture("wood", "textures/wood.jpg"); */
 
             load_texture_btn = new Fl_Button(w-290,base_y_tab+40, 120,20, "Load Texture...");
             load_texture_btn->callback(Load_Texture_CB, (void*)this);
@@ -582,12 +530,12 @@ void Material_Window::Menu_CB2(){
 	// handle appropriate callbacks
 	if(strcmp(selected, "File/New")==0){
 	    //printf("selected New\n");
-	    current_name = '\0';
+	    memset(current_name, '\0', 1024);
 	    new_cb();
 	}
 	else if(strcmp(selected, "File/Open")==0){
 	    //printf("selected Open\n");
-	    current_name = '\0';
+	    memset(current_name, '\0', 1024);
 	    open_cb();
 	}
 	else if(strcmp(selected, "File/Save")==0){
@@ -647,15 +595,11 @@ void Material_Window::Texture_CB2(){
 	// grab texture
 	texture_choices->item_pathname(selected, sizeof(selected)-1);
 
-	printf("in texture_cb2: %s\n", selected);
-	printf("size of loaded_textures: %d\n", loaded_textures.size());
 	for(i=0; i < loaded_textures.size(); i++){
-
-	    printf("looking at: %s\n", loaded_textures[i].name.c_str());
 		if(!strcmp(loaded_textures[i].name.c_str(),selected)){
-		    printf("selected: %s loaded_texture: %s\n", selected, loaded_textures[i].name.c_str());
-			//glwin->getTexture(i);
 			glwin->getTexture(loaded_textures[i].image);
+			iTexture = i;
+			printf("iTexture selected %d\n", iTexture);
 		}
 	}
 	changed = 1;
@@ -681,20 +625,27 @@ void Material_Window::Load_Texture_CB2(){
         fp = fopen(newfile, "r");
         if(fp != '\0')
         {
-            //printf("loading texture: %s\n", newfile);
             path = new string(newfile);
             found = path->find_last_of("/\\");
             file = path->substr(found+1);
 
-            //glwin->addTexture(file,*path);
+
+
+
+            for(int i=0; i<loaded_textures.size(); i++){
+                if(!strcmp(loaded_textures[i].name.c_str(),("/"+file).c_str())){
+                    return;
+                }
+            }
             texture_choices->add(file.c_str(),0,Texture_CB, (void*)this);
-            //loaded_textures.push_back("/"+file);
-            //loaded_texture_paths.push_back(*path);
+
             struct texture_element te;
             te.name = "/"+file;
             te.path = *path;
             te.image = osgDB::readImageFile(*path);
+
             loaded_textures.push_back(te);
+            new_textures.push_back(te);
 
         }
         else
@@ -704,7 +655,6 @@ void Material_Window::Load_Texture_CB2(){
             message.append(" is not found.\n");
             fl_alert(message.c_str(), "OKay");
         }
-        //printf("filename is: %s\n", file.c_str());
     }
 }
 
@@ -783,7 +733,7 @@ void Material_Window::open_cb(){
 void Material_Window::save_cb(){
     // make sure that it has a filename
    // printf("current_name: %s\n", current_name);
-    if(current_name == '\0')
+    if(current_name[0] == '\0')
     {
         saveas_cb();
         return;
@@ -808,7 +758,8 @@ void Material_Window::saveas_cb(){
         {
             temp->append(".mat");
             newfile = (char *)temp->c_str();
-            current_name = newfile;
+            memset(current_name, '\0', 1024);
+            memcpy(current_name, newfile, 1024);
         }
 
         //printf("in saveas_cb: current_name is: %s\n", current_name);
@@ -819,7 +770,7 @@ void Material_Window::saveas_cb(){
 }
 
 void Material_Window::save_file(char* f){
-    //printf("file to be saved is: %s\n", f);
+    printf("file to be saved is: %s\n", f);
     string temp = "";
     FILE *fp;
     mxml_node_t     *tree;              // root <xml>
@@ -870,16 +821,19 @@ void Material_Window::save_file(char* f){
     alpha_node      = mxmlNewElement(material_node, "alpha");
     mxmlNewText(alpha_node, 0, alpha_input->value());
 
-    // grab only index of texture in library
-    for(int i=0; i<loaded_textures.size(); i++){
+    texture_node = mxmlNewElement(material_node, "texture_index");
+    char index[5];
+    sprintf(index, "%d", iTexture);
+    mxmlNewText(texture_node,0,index);
+
+    // saves new textures
+    for(int i=0; i<new_textures.size(); i++){
         texture_node    = mxmlNewElement(material_node, "texture");
         name_node       = mxmlNewElement(texture_node, "name");
-        mxmlNewText(name_node,0,loaded_textures[i].name.c_str());
+        mxmlNewText(name_node,0,new_textures[i].name.c_str());
         path_node       = mxmlNewElement(texture_node, "path");
-        mxmlNewText(path_node,0,loaded_textures[i].path.c_str());
+        mxmlNewText(path_node,0,new_textures[i].path.c_str());
     }
-
-    //mxmlNewInteger(texture_node, iTexture);
 
     // grab only index of shape in library
     shape_node    = mxmlNewElement(material_node, "shape");
@@ -901,6 +855,14 @@ void Material_Window::open_file(char* f){
 
     //printf("in open_file. filename is %s\n", f);
     fp = fopen(f, "r");
+
+    printf("in open_file - sizeof new_textures: %d\n", new_textures.size());
+    // clear previous textures
+    for(int i=0; i<new_textures.size(); i++){
+            texture_choices->remove(texture_choices->size()-2);
+            loaded_textures.pop_back();
+    }
+    new_textures.clear();
 
     if(fp != '\0'){
         tree = mxmlLoadFile(NULL, fp, MXML_TEXT_CALLBACK);
@@ -960,11 +922,33 @@ void Material_Window::open_file(char* f){
         working_node = top_node->child;
         alpha_input->value(working_node->value.text.string);
 
+        /* grab index of the texture being used */
+        top_node = mxmlFindElement(tree, tree, "texture_index", NULL, NULL, MXML_DESCEND);
+        iTexture = atoi(top_node->child->value.text.string);
+
         /* find the first element with "texture" attribute */
-        top_node = mxmlFindElement(tree, tree, "texture", NULL, NULL, MXML_DESCEND);
-        working_node = top_node->child;
-        iTexture = atoi(working_node->value.text.string);
-        texture_choices->value(iTexture);
+        for(top_node = mxmlFindElement(tree, tree, "texture", NULL, NULL, MXML_DESCEND);
+            top_node != '\0';
+            top_node = mxmlFindElement(top_node, tree, "texture", NULL, NULL, MXML_DESCEND))
+        {
+            struct texture_element elem;
+
+            working_node = top_node->child->child;
+
+            elem.name = working_node->value.text.string;
+            string choice_name = elem.name.substr(1,elem.name.length()-1);
+
+            working_node = top_node->child->next->child;
+            elem.path = working_node->value.text.string;
+
+
+            elem.image = osgDB::readImageFile(elem.path);
+
+            texture_choices->add(choice_name.c_str(),0,Texture_CB, (void*)this);
+            //printf("loading extra textures: %s\n", elem.name.c_str());
+            loaded_textures.push_back(elem);
+            new_textures.push_back(elem);
+        }
 
         /* find the first element with "shape" attribute */
         top_node = mxmlFindElement(tree, tree, "shape", NULL, NULL, MXML_DESCEND);
@@ -973,14 +957,20 @@ void Material_Window::open_file(char* f){
 
         fromKeyboard = 1;
 
+        printf("iTexture to load is: %d\n", iTexture);
+
         UpdateMaterial2();
         //glwin->getTexture
-        //glwin->getTexture(iTexture);
+        glwin->getTexture(loaded_textures[iTexture].image);
+        texture_choices->value(iTexture);
+
         glwin->changeShape(iShape, next);
         iShape = next;
 
         changed = 0;
-        current_name = f;
+        memset(current_name, '\0', 1024);
+        memcpy(current_name, f, 1024);
+
         fclose(fp);
     }
     else
@@ -1010,11 +1000,23 @@ void Material_Window::new_file(){
     alpha_input->value("1.000");
     shininess_input->value("10");
 
-    glwin->getTexture(0);
+    glwin->getTexture(loaded_textures[0].image);
+
+    printf("in new_file - size of new_textures: %d\n", new_textures.size());
+    printf("in new_file - size of current textures: %d\n", texture_choices->size());
+    printf("size of texture choices: %d\n", texture_choices->size());
+
+    // remove uploaded textures
+    for(int i=0; i<new_textures.size(); i++){
+        texture_choices->remove(texture_choices->size()-2);
+        loaded_textures.pop_back();
+    }
+    new_textures.clear();
 
     fromKeyboard = 1;
     changed = 0;
     UpdateMaterial2();
+
 }
 
 void Material_Window::Update_Variables_OK_CB(Fl_Widget* w, void* data){
@@ -1041,7 +1043,6 @@ void Material_Window::Update_Variables_CANCEL_CB(Fl_Widget* w, void* data){
 }
 
 void Material_Window::Update_Variables_CANCEL_CB2(){
-	//printf("cancel is clicked\n");
 	material_var->value(material_var_s.c_str());
 	texture_var->value(texture_var_s.c_str());
 	image_var->value(image_var_s.c_str());
@@ -1063,14 +1064,13 @@ void Material_Window::getTextures(const char* directory){
 	struct dirent *ent;
 	dir = opendir(directory);
 	string temp = "";
-
-	//string filename = path.find_last_of()
+    printf("number of pre-loaded textures before: %d\n", texture_choices->size());
 
 	if(dir != NULL){
 		while( ((ent = readdir(dir)) != NULL) )
 		{
 			if(ent->d_name[0] != '.'){
-				//printf("%s\n", ent->d_name);
+
 				texture_choices->add(ent->d_name,0,Texture_CB, (void*)this);
 
 				struct texture_element te;

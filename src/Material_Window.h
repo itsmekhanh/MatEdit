@@ -142,9 +142,8 @@ private:
     Fl_Choice *MIN_filterMode_choices;      // MIN filter Modes
     Fl_Choice *MAG_filterMode_choices;      // MAG filter Modes
 
-    //vector<string> loaded_textures;			// textures stored in memory <name in list, filepath>
-    //vector<string> loaded_texture_paths;    // paths of the texture files
     vector<texture_element> loaded_textures;    // textures stored in memory (name, path, image)
+    vector<texture_element> new_textures;       // keeps track of which textures are new imports
 
     int iTexture;
 /* ----------------------- code generation -------------------------*/
@@ -153,7 +152,6 @@ private:
     Fl_Multiline_Input *code_text;      // actual code of the rendering
     Fl_Double_Window *code_window;      // window holding the code
     Fl_Scroll *code_scroll;             // scroller for large codes
-    //Code_Window*    cw;                 // popup window with generated code
 
 /* ----------------------- menu bar options ------------------------*/
 
@@ -163,7 +161,7 @@ private:
     Fl_File_Chooser* filechooser;       // file browser to save/open files
     int				changed;	        // flag to check if file was changed
     char			filename[1024];		// name of the file
-    char*           current_name;       // current name of the file
+    char            current_name[1024];       // current name of the file
     int             iShape;             // index of current shape
     vector<string>  shapes;             // vector of shape names
 

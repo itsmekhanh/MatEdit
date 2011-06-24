@@ -122,12 +122,6 @@ void GL_Window::updateProperties(float dr, float dg, float db,
 
     redraw();
 }
-//
-//void GL_Window::addTexture(string name, string path){
-//    //printf("name is: %s and path is: %s\n", name.c_str(), path.c_str());
-//	osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path);
-//    texture_vec.push_back(image);
-//}
 
 void GL_Window::getTexture(osg::ref_ptr<osg::Image> image){
 
@@ -137,14 +131,12 @@ void GL_Window::getTexture(osg::ref_ptr<osg::Image> image){
     }
     else
     {
-        //printf("turning textures off\n");
         stateset->setTextureAttributeAndModes (0, texture.get(), osg::StateAttribute::OFF);
     }
     redraw();
 }
 
 void GL_Window::changeShape(int old,int next){
-    //printf("in changeShape: old %d and next: %d\n", old, next);
     geode->removeDrawable(shape_vec[old]);
     geode->addDrawable(shape_vec[next]);
     redraw();
